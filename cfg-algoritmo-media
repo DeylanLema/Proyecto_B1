@@ -1,0 +1,39 @@
+#define tam_sig 600//tamano de la señal cardiaca
+#define tam_imp 21//tamaño de filtro FIR
+extern int ecg_100Hz [tam_sig];//Traer una pestaña
+extern int Impulse_response[tam_imp];//Traer una pestaña
+double output_media[tam_sig];//salida de nuestras señales - MEDIA
+
+int i;//variable for
+int j;//variable for
+int digi_conv;//variable para mapeo de datos
+int digi_conv1;//variable para mapeo de datos
+int digi_conv2;//variable para mapeo de datos
+void media(int *sig_in, float*output, int sig_tam, float beta);
+void setup() {
+}
+
+void loop() {
+
+
+media((int *)&ecg_100Hz[0], (float*)& output_media[0], (int) tam_sig,  0.2) ; //declaracion a metodo media
+ int i;          
+for(i=0;i<tam_sig;i++){//ciclo for para mapeo de datos y remplazo en las salidas de cada señal
+digi_conv=map(ecg_100Hz[i],0,980,0,255);//conversion de datos
+digi_conv1=map(ecg_100Hz[i]-output_media[i],0,980,0,255);//conversion de datos
+digi_conv2=map(output_media[i],0,980,0,255);//conversion de datos
+analogWrite(6,digi_conv);//grafica de nuestra señal en puerto 6
+analogWrite(5,digi_conv1);//grafica de nuestra señal en puerto 5
+analogWrite(3,digi_conv2);//grafica de nuestra señal en puerto 3
+delay(10);
+}
+}
+
+ //////////////////FILTRO DE MEDIA MOVIL////////////////////
+ void media(int *sig_in, float *output_media, int sig_tam, float beta){
+  int i;
+  output_media[i]=0;
+  for(i=0;i<sig_tam;i++){
+  output_media[i]=(beta*sig_in[i])+(1-beta)*output_media[i];
+  } 
+}
