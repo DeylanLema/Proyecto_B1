@@ -1,0 +1,40 @@
+#define tam_sig 900
+#define tam_imp 21
+extern int mq2 [tam_sig];
+extern int Impulse_response[tam_imp];
+double output[tam_sig+tam_imp];
+double output_media[tam_sig];
+
+int i;
+int j;
+int digi_conv;
+int digi_conv1;
+int digi_conv2;
+void media(int *sig_in, float*output, int sig_tam, float beta);
+void setup() {
+}
+
+void loop() {
+
+
+media((int *)&mq2[0], (float*)& output_media[0], (int) tam_sig,  0.2) ; 
+ int i;          
+for(i=0;i<tam_sig;i++){
+digi_conv=map(mq2[i],0,980,0,255);
+digi_conv1=map(mq2[i]-output_media[i],0,980,0,255);
+digi_conv2=map(output_media[i],0,980,0,255);
+analogWrite(6,digi_conv);
+analogWrite(5,digi_conv1);
+analogWrite(3,digi_conv2);
+delay(10);
+}
+}
+
+ //////////////////FILTRO DE MEDIA MOVIL////////////////////
+ void media(int *sig_in, float *output_media, int sig_tam, float beta){
+  int i;
+  output_media[i]=0;
+  for(i=0;i<sig_tam;i++){
+  output_media[i]=(beta*sig_in[i])+(1-beta)*output_media[i];
+  } 
+}
