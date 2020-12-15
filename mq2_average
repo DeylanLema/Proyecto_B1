@@ -1,0 +1,45 @@
+#define tam_sig 900
+#define tam_imp 21
+extern int mq2 [tam_sig];
+extern int Impulse_response[tam_imp];
+double output[tam_sig+tam_imp];
+double output_signal[tam_sig];
+
+int i;
+int j;
+int digi_conv;
+int digi_conv1;
+int digi_conv2;
+void moving_average(int *sig_in, int *output_signal, int sig_tam, int filter);
+void setup() {
+}
+
+void loop() {
+
+
+moving_average((int *)&mq2[0],(int *)& output_signal[0],(int) tam_sig,11);
+ int i;          
+for(i=0;i<tam_sig;i++){
+digi_conv=map(mq2[i],0,980,0,255);
+digi_conv1=map(mq2[i]-output_signal[i],0,980,0,255);
+digi_conv2=map(output_signal[i],0,980,0,255);
+analogWrite(6,digi_conv);
+analogWrite(5,digi_conv1);
+analogWrite(3,digi_conv2);
+delay(10);
+}
+}
+////////////////SUAVIZADO DE SEÑAL///////////////////////////////
+void moving_average(int *sig_in,int *outpu_signal, int sig_tam, int filter){
+  int i,j;
+  for(i=floor(filter/2);i<sig_tam-floor(filter/2)-1;i++){
+    output_signal[i]=0;
+  
+    for(j=-floor(filter/2);j<floor(filter/2);j++){
+      output_signal[i]=output_signal[i]+sig_in[i+j];
+      
+   }
+    output_signal[i]=output_signal[i]/filter;
+  
+  }
+}
